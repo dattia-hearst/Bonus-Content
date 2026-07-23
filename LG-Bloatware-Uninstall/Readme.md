@@ -1,6 +1,6 @@
 # LG Monitor App Removal Scripts
 
-These three PowerShell scripts detect and remove the **LG Monitor App** (`LGElectronics.LGMonitorApp`) — the bloatware that LG silently installs on systems connected to LG monitors — and apply a registry policy to prevent it from being reinstalled.
+These three PowerShell scripts detect and remove the **LG Monitor App** (`LGElectronics.LGMonitorApp`) — the bloatware that LG silently installson systems connected to LG monitors — and apply a registry policy to prevent it from being reinstalled.
 
 ---
 
@@ -20,6 +20,8 @@ Queries `Get-AppxPackage` across all user profiles and returns a simple object:
 
 Run this first to confirm whether the bloatware is present before taking action.
 
+**PDQ Connect / PDQ Deploy:** Use `LG_Scanner.ps1` as a scan script to report which machines in your environment have the LG Monitor App installed. In Connect, add it as a PowerShell step in a scan profile; in Deploy, use it as a scan step in a package to target only affected machines.
+
 ---
 
 ### `LG_Reg.ps1` — Registry Policy
@@ -33,11 +35,15 @@ If the key doesn't exist, the script creates it. If it does, the value is overwr
 
 Run this to prevent the bloatware from reinstalling itself after removal.
 
+**PDQ Connect / PDQ Deploy:** Add `LG_Reg.ps1` as a PowerShell step in a package to deploy the registry policy across your fleet.
+
 ---
 
 ### `LG_Uninstall.ps1` — Removal
 
 Uninstalls the LG Monitor App for all users and removes it from the provisioned package list so it won't be re-deployed to new user profiles on the same machine.
+
+**PDQ Connect / PDQ Deploy:** Add `LG_Uninstall.ps1` as a PowerShell step in a package to remove the app at scale. Pair it with `LG_Scanner.ps1` as a scan condition so the package only runs on machines where the app is detected.
 
 Runs two operations:
 1. `Remove-AppxPackage -AllUsers` — removes the installed package from all existing user accounts
@@ -53,4 +59,3 @@ Runs two operations:
 4. **`LG_Scanner.ps1`** again — verify `Installed` returns `False`
 
 ---
-
